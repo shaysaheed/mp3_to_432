@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# convertir_a_432hz.sh  <carpeta>  [44100|48000]
+
+INPUT_DIR="${1:-.}"
+TARGET_SR="${2:-48000}"  # Puedes poner 44100 si gustas
+OUTPUT_DIR="convertidos_${TARGET_SR}"
+THREADS=2
+VBR_QUALITY=4
+
+pitch_filter="asetrate=${TARGET_SR}*432/440,aresample=${TARGET_SR},loudnorm=I=-16:TP=-1.5:LRA=11"
+
+# Buscar archivos con extensiones comunes de audio
+find "$INPUT_DIR" -type f \( \
+  -iname "*.flac" -o \
+  -iname "*.opus" -o \
+  -iname "*.wav" -o \
+  -iname "*.mp3" -o \
+  -iname "*.m4a" -o \
+  -iname "*.aac" -o \
+  -iname "*.ogg" \
+\) -print0 |
+while IFS= read -r -d '' file; do
+    rel="${file#${INPUT_DIR}/}"
+    base="${rel%.*}"
+    out="$OUTPUT_DIR/${base}_432hz.mp3"
+    mkdir -p "$(dirname "$out")"
+
+    ffmpeg -nostdin -hide_banner -loglevel error \
+           -i "$file" -af "$pitch_filter" \
+           -c:a libmp3lame -qscale:a "$VBR_QUALITY" \
+           -threads "$THREADS" "$out"
+done
