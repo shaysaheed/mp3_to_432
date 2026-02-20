@@ -2,7 +2,7 @@
 # uso: convertir_a_432hz.sh  <carpeta>  [44100|48000]
 # por seguridad pocicionarte en un directorio de prueba,
 # si no agregas los parámetros "<carpeta>  [44100|48000]"
-# el script trabajará en el directorio actual.
+# el script trabajará en el directorio actual por defecto.
 
 INPUT_DIR="${1:-.}"
 TARGET_SR="${2:-48000}"  # Puedes poner 44100 si gustas
